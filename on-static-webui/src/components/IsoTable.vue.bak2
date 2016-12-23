@@ -1,4 +1,18 @@
 <template>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ title }}</h3>
+        </div>
+
+        <ResourceTable :headerItems="isoKeys" :bodyItems="isos" @removeRow="removeIso"></ResourceTable>
+
+        <button type="button" class="btn btn-success btn-block" @click="clickAddIso">
+            <span v-if="!showIsoUpload" class="glyphicon glyphicon-plus-sign"></span>
+            <span v-else class="glyphicon glyphicon-minus-sign"></span>
+        </button>
+        
+        <FileUploader id="isoUpload" v-show="showIsoUpload" :baseUrl="baseUrl" @finished="uploadFinished"></FileUploader>
+    </div>
 </template>
 
 <script>

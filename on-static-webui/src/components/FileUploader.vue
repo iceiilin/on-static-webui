@@ -1,15 +1,25 @@
 <template>
     <div>
-        <div v-show="showIsoUpload" class="input-group">
+        <div class="input-group">
             <label id="file-browse" class="input-group-addon">
-            Browse...<input @change="fileSelected" type="file" style="display: none">
-</label>
-<input type="text" class="form-control" disabled placeholder="iso file name">
-</div>
-<button v-show="showIsoUpload" @click="uploadFile" :disabled="disableFileUploadButton" type="button" class="btn btn-success btn-block">
+                Browse...<input id="fileUploadInput" @change="fileSelected" type="file" style="display: none">
+            </label>
+            <input type="text" :value="selectedFileName" class="form-control" disabled placeholder="iso file name">
+        </div>
+
+        <div class="" v-show="uploadStarted">
+            <div class="progress-bar progress-bar-striped" :class="{active: uploadIsActive}" role="progressbar" :style="progressbarWidth">
+                {{ uploadProgress + "%"}}
+            </div>
+        </div>
+
+        <button v-if="!uploadIsActive" @click="uploadFile" :disabled="disableFileUploadButton" type="button" class="btn btn-success btn-block">
             <span class="glyphicon glyphicon-ok"></span>
         </button>
-</div>
+        <button v-else @click="stopUpload" :disabled="disableFileUploadButton" type="button" class="btn btn-default btn-block">
+            <span id="stopUpload" class="glyphicon glyphicon-remove"></span>
+        </button>
+    </div>
 </template>
 
 <script>
@@ -23,37 +33,76 @@
             baseUrl: {
                 type: String,
                 default: ""
+            },
+            fileUploadUrl: {
+                type: String,
+                default: "iso?name="
+            },
+            showFileUploadGroup: {
+                type: Boolean,
+                default: true
+            },
+            supportedFileTypes: {
+                type: Array,
+                default: function(){
+                    return ['*']
+                }
+            }
+        },
+        computed: {
+            progressbarWidth: function() {
+                return "width: " + this.uploadProgress + "%";
+            },
+            uploadIsActive: function() {
+                if(this.uploadProgress > 0 && this.uploadProgress < 100) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            uploadStarted: function() {
+                if(this.uploadProgress > 0 && this.uploadProgress <= 100) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            selectedFileName: function() {
+                return this.fileToUpload.name;
             }
         },
         methods: {
+            stopUpload: function() {
+                if(this.xhr){
+                    this.xhr.abort();
+                    this.uploadProgress = 0;
+                }
+            },
             uploadFile: function () {
                 var self = this;
                 console.log('uploading file');
                 var reader = new FileReader();
 
-                let xhr = new XMLHttpRequest();
-                let uploader = xhr.upload;
+                self.xhr = new XMLHttpRequest();
+                let uploader = self.xhr.upload;
 
                 let fileName = this.fileToUpload.name;
-                let fileSize = this.fileToUpload.size;
-                let blockSize = 1 * 1024 * 1024;
                 let uploadedSize = 0;
-                let uploadProgress = 0;
 
                 uploader.addEventListener('progress', function (event) {
                     uploadedSize = event.loaded;
-                    uploadProgress = event.loaded * 100/event.total;
-                    console.log(uploadedSize, ' has been sent', 'progress: ', uploadProgress);
+                    self.uploadProgress = (event.loaded * 100 / event.total).toFixed(1);
+                    console.log(uploadedSize, ' has been sent', 'progress: ', self.uploadProgress);
                 });
 
                 uploader.addEventListener('load', function () {
                     console.log('upload finished');
-                    self.getIsos();
+                    self.$emit('finished');
                 });
 
-                xhr.open("PUT", baseUrl + "/iso?name=" + fileName);
-                xhr.overrideMimeType("application/octet-stream");
-                xhr.send(self.fileToUpload);
+                self.xhr.open("PUT", this.baseUrl + this.fileUploadUrl + fileName);
+                self.xhr.overrideMimeType("application/octet-stream");
+                self.xhr.send(self.fileToUpload);
             },
             fileSelected: function (event) {
                 console.log('file selected', event);
@@ -64,24 +113,42 @@
                     let file = files[0];
                     let fileName = file.name;
 
-                    if (fileName.indexOf('.iso') > 0) {
+                    if (this.validateFileType(fileName)) {
                         this.fileToUpload = file;
                         this.disableFileUploadButton = false;
                     } else {
-                        alert("please choose iso file which end with \'.iso\'");
-                        this.disaleFileUploadButton = true;
+                        alert("please choose iso file which end with", JSON.stringify(this.supportedFileTypes));
+                        this.disableFileUploadButton = true;
                     }
                 } else {
                     this.disableFileUploadButton = true;
                 }
+                console.log('---', this.disableFileUploadButton);
             },
-            toggleShowUploadIso: function () {
-                this.showIsoUpload = !this.showIsoUpload
+            validateFileType: function(fileName){
+                console.log('----------', this.supportedFileTypes, this.supportedFileTypes[0], JSON.stringify(this.supportedFileTypes));
+
+                if(this.supportedFileTypes.length === 0){
+                    return false;
+                }
+                
+                let validateResult = false;
+
+                this.supportedFileTypes.forEach(function(type){
+                    if(type === "*"){
+                        validateResult = true;
+                    } else if(fileName.indexOf(type) >=0) {
+                        validateResult = true;
+                    }
+                });
+
+                return validateResult;
             }
         },
         data() {
             return {
                 disableFileUploadButton: true,
+                uploadProgress: 0,
                 fileToUpload: {}
             }
         }
@@ -92,6 +159,10 @@
 <style scoped>
 h3 {
     text-align: center
+}
+
+#stopUpload {
+    color: red
 }
 
 #file-browse {

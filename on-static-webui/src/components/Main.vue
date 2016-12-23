@@ -6,20 +6,41 @@
 
 <div class="row">
     <div class="col-md-12">
-        <IsoTable title="Image Management">
-        </IsoTable>
+        <ImageManagementTable
+            title="Image File Management"
+            :baseUrl="baseUrl"
+            imageUploadUrl="images?name="
+            imageDeleteUrl="images?name="
+            imageListUrl="images"
+            :supportedFileTypes="['.iso']"
+        >
+        </ImageManagementTable>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <IsoTable>
-        </IsoTable>
+        <FileManagementTable
+            title="ISO File Management"
+            :baseUrl="baseUrl"
+            fileUploadUrl="iso?name="
+            fileDeleteUrl="iso?name="
+            fileListUrl="iso"
+            :supportedFileTypes="['.iso']"
+        >
+        </FileManagementTable>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <IsoTable title="Microkernel File Management">
-        </IsoTable>
+        <FileManagementTable
+            title="MicroKernel File Management"
+            :baseUrl="baseUrl"
+            fileUploadUrl="microkernel?name="
+            fileDeleteUrl="microkernel?name="
+            fileListUrl="microkernel"
+            :supportedFileTypes="['*']"
+        >
+        </FileManagementTable>
     </div>
 </div>
 </div>
@@ -29,25 +50,25 @@
 <script>
     import { alert } from 'vue-strap';
 
-    import IsoTable from './IsoTable';
+    import FileManagementTable from './FileManagementTable';
+    import ImageManagementTable from './ImageManagementTable';
 
     import StaticRequester from 'common-src/StaticRequester';
 
     import 'bootstrap';
 
-    let baseUrl = 'http://10.62.59.150:7070'
-
     export default {
         name: 'main',
         components: {
-            IsoTable: IsoTable,
+            FileManagementTable: FileManagementTable,
+            ImageManagementTable: ImageManagementTable,
             Alert: alert
         },
         methods: {
             getIsos: function () {
                 var self = this;
 
-                self.$ = new StaticRequester(baseUrl);
+                self.$ = new StaticRequester(this.baseUrl);
 
                 return self.$.getIsos()
                     .then((response) => {
@@ -92,7 +113,8 @@
         },
         data: function () {
             return {
-                isos: [{ size: 100, name: 'test' }]
+                isos: [{ size: 100, name: 'test' }],
+                baseUrl: "http://10.62.59.150:7070/"
             }
         }
     }
