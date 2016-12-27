@@ -95,9 +95,13 @@
                     console.log(uploadedSize, ' has been sent', 'progress: ', self.uploadProgress);
                 });
 
-                uploader.addEventListener('load', function () {
+                uploader.addEventListener('load', function (target) {
                     console.log('upload finished');
-                    self.$emit('finished');
+                    if(target.currentTarget.status >= 400){
+                        self.$emit('error', target);
+                    }else {
+                        self.$emit('finished');
+                    }
                 });
 
                 self.xhr.open("PUT", this.baseUrl + this.fileUploadUrl + fileName);
@@ -105,8 +109,6 @@
                 self.xhr.send(self.fileToUpload);
             },
             fileSelected: function (event) {
-                console.log('file selected', event);
-                console.log('file selected', event.target.files);
                 let files = event.target.files;
 
                 if (files.length) {
@@ -123,10 +125,8 @@
                 } else {
                     this.disableFileUploadButton = true;
                 }
-                console.log('---', this.disableFileUploadButton);
             },
             validateFileType: function(fileName){
-                console.log('----------', this.supportedFileTypes, this.supportedFileTypes[0], JSON.stringify(this.supportedFileTypes));
 
                 if(this.supportedFileTypes.length === 0){
                     return false;

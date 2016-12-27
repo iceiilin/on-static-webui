@@ -11,7 +11,7 @@ export default class Requester {
     }
 
     get(url, config) {
-        return this.$.get(url, config || {});
+        return this.$.get(url, config || {timeout: 1000});
     }
 
     put(url, data, config) {

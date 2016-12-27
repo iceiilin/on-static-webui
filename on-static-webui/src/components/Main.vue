@@ -2,47 +2,66 @@
     <div class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <a class="navbar-brand" href="#" style="color: white">on-static web ui</a>
-</nav>
+        </nav>
 
-<div class="row">
-    <div class="col-md-12">
-        <ImageManagementTable
-            title="Image File Management"
-            :baseUrl="baseUrl"
-            imageUploadUrl="images?name="
-            imageDeleteUrl="images?name="
-            imageListUrl="images"
-            :supportedFileTypes="['.iso']"
-        >
-        </ImageManagementTable>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">On-Static Host Settings</h3>
+                </div>
+                <!--<div class="form-inline">-->
+                    <div class="form-group">
+                        <label>IP address</label>
+                        <input type="text" v-model="hostIpAddr" @change="hostChanged" class="form-control has-success">
+                    </div>
+                    <div class="form-group">
+                        <label>port</label>
+                        <input type="text" v-model="hostPort" @change="hostChanged" class="form-control">
+                    </div>
+                <!--</div>-->
+            </div>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <FileManagementTable
-            title="ISO File Management"
-            :baseUrl="baseUrl"
-            fileUploadUrl="iso?name="
-            fileDeleteUrl="iso?name="
-            fileListUrl="iso"
-            :supportedFileTypes="['.iso']"
-        >
-        </FileManagementTable>
+    <div class="row">
+        <div class="col-md-12">
+            <ImageManagementTable
+                title="Image File Management"
+                :baseUrl="baseUrl"
+                imageUploadUrl="images?"
+                imageDeleteUrl="images?"
+                imageListUrl="images"
+                :supportedFileTypes="['.iso']"
+            >
+            </ImageManagementTable>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <FileManagementTable
-            title="MicroKernel File Management"
-            :baseUrl="baseUrl"
-            fileUploadUrl="microkernel?name="
-            fileDeleteUrl="microkernel?name="
-            fileListUrl="microkernel"
-            :supportedFileTypes="['*']"
-        >
-        </FileManagementTable>
+    <div class="row">
+        <div class="col-md-12">
+            <FileManagementTable
+                title="ISO File Management"
+                :baseUrl="baseUrl"
+                fileUploadUrl="iso?name="
+                fileDeleteUrl="iso?name="
+                fileListUrl="iso"
+                :supportedFileTypes="['.iso']"
+            >
+            </FileManagementTable>
+        </div>
     </div>
-</div>
+    <div class="row">
+        <div class="col-md-12">
+            <FileManagementTable
+                title="MicroKernel File Management"
+                :baseUrl="baseUrl"
+                fileUploadUrl="microkernel?name="
+                fileDeleteUrl="microkernel?name="
+                fileListUrl="microkernel"
+                :supportedFileTypes="['*']"
+            >
+            </FileManagementTable>
+        </div>
+    </div>
 </div>
 
 </template>
@@ -91,6 +110,9 @@
                     .then(function () {
                         return self.getIsos();
                     })
+            },
+            hostChanged: function(){
+                console.log('host changed', this.baseUrl);
             }
         },
         mounted: function () {
@@ -109,12 +131,16 @@
                 } else {
                     return Object.keys(this.isos[0]);
                 }
+            },
+            baseUrl: function(){
+                return "http://" + this.hostIpAddr + ":" + this.hostPort + '/';
             }
         },
         data: function () {
             return {
                 isos: [{ size: 100, name: 'test' }],
-                baseUrl: "http://10.62.59.150:7070/"
+                hostIpAddr: "10.62.59.150",
+                hostPort: "7070"
             }
         }
     }

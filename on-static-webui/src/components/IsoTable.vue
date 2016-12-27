@@ -2,13 +2,7 @@
 </template>
 
 <script>
-    import 'bootstrap';
-
-    import ResourceTable from './Table';
-    import FileUploader from './FileUploader';
-
-    import StaticRequester from 'common-src/StaticRequester';
-
+    import FileManagementTable from './FileManagementTable';
 
     export default {
         name: 'IsoTable',

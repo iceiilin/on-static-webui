@@ -1,7 +1,11 @@
 <template>
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title">{{ title }}</h3>
+            <h3 class="panel-title">{{ title }}    
+                <button type="button" class="btn btn-primary btn-xs btn-transparent" @click="getFiles">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </h3>
         </div>
 
         <ResourceTable :headerItems="fileKeys" :bodyItems="files" @removeRow="removeFile"></ResourceTable>
@@ -11,7 +15,7 @@
             <span v-else class="glyphicon glyphicon-minus-sign"></span>
         </button>
         
-        <FileUploader id="fileUpload" v-show="showFileUpload" :baseUrl="baseUrl" :fileUploadUrl="fileUploadUrl" :supportedFileTypes="supportedFileTypes" @finished="uploadFinished"></FileUploader>
+        <FileUploader id="fileUpload" v-show="showFileUpload" :baseUrl="baseUrl" :fileUploadUrl="fileUploadUrl" :supportedFileTypes="supportedFileTypes" @finished="uploadFinished" @error="uploadErrored"></FileUploader>
     </div>
 </template>
 
@@ -61,7 +65,6 @@
             }
         },
         mounted: function () {
-            this.$ = new Requester(this.baseUrl);
 
             this.getFiles();
         },
@@ -78,11 +81,17 @@
                 }
             }
         },
+        watch: {
+            baseUrl: function(){
+                return this.getFiles();
+            }
+        },
         methods: {
             getFiles: function () {
                 var self = this;
 
-                return self.$.get(this.fileListUrl)
+                let $ = new Requester(this.baseUrl);
+                return $.get(this.fileListUrl)
                     .then((response) => {
                         console.log('file list: ', response.data);
                         self.files = response.data;
@@ -91,6 +100,7 @@
                     .catch((err) => {
                         console.log('Get file request failed: ', this.baseUrl)
                         console.log('err', err)
+                        self.files = [];
                     })
             },
             removeFile: function (id) {
@@ -99,13 +109,17 @@
                 console.log(this.files[id]);
                 let fileName = this.files[id].name;
 
-                return self.$.delete(this.fileDeleteUrl + fileName)
+                let $ = new Requester(this.baseUrl);
+                return $.delete(this.fileDeleteUrl + fileName)
                     .then(function () {
                         return self.getFiles();
                     })
             },
             uploadFinished: function () {
                 this.getFiles();
+            },
+            uploadErrored: function (target) {
+                alert(target.currentTarget.statusText + ': ' + target.currentTarget.response);
             },
             clickAddFile: function () {
                 this.showFileUpload = !this.showFileUpload
