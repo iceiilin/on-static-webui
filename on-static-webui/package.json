@@ -18,7 +18,8 @@
     "bootstrap": "^3.3.7",
     "bootstrap-vue": "0.3.10",
     "vuestrap-base-components": "^0.8.10",
-    "validator": "^6.2.0"
+    "validator": "^6.2.0",
+    "debounce": "^1.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",

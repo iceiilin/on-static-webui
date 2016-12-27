@@ -13,11 +13,11 @@
                 <!--<div class="form-inline">-->
                     <div class="form-group">
                         <label>IP address</label>
-                        <input type="text" v-model="hostIpAddr" @change="hostChanged" class="form-control has-success">
+                        <input type="text" v-model.trim="hostIpAddr" @change="hostChanged" class="form-control has-success">
                     </div>
                     <div class="form-group">
                         <label>port</label>
-                        <input type="text" v-model="hostPort" @change="hostChanged" class="form-control">
+                        <input type="text" v-model.number="hostPort" @change="hostChanged" class="form-control">
                     </div>
                 <!--</div>-->
             </div>
@@ -76,6 +76,8 @@
 
     import 'bootstrap';
 
+    import debounce from 'debounce';
+
     export default {
         name: 'main',
         components: {
@@ -111,9 +113,12 @@
                         return self.getIsos();
                     })
             },
-            hostChanged: function(){
-                console.log('host changed', this.baseUrl);
-            }
+            // hostChanged: function(){
+            //     console.log('host changed', this.baseUrl);
+            // },
+            hostChanged: debounce(function(){
+                this.baseUrl = "http://" + this.hostIpAddr + ":" + this.hostPort + '/';
+            }, 500)
         },
         mounted: function () {
             var self = this;
@@ -131,16 +136,17 @@
                 } else {
                     return Object.keys(this.isos[0]);
                 }
-            },
-            baseUrl: function(){
-                return "http://" + this.hostIpAddr + ":" + this.hostPort + '/';
             }
+            // baseUrl: function(){
+            //     return "http://" + this.hostIpAddr + ":" + this.hostPort + '/';
+            // }
         },
         data: function () {
             return {
                 isos: [{ size: 100, name: 'test' }],
                 hostIpAddr: "10.62.59.150",
-                hostPort: "7070"
+                hostPort: "7070",
+                baseUrl: "http://10.62.59.150:7070"
             }
         }
     }
