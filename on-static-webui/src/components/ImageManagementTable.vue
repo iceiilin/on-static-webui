@@ -43,7 +43,7 @@
                 <input type="text" :value="selectedFileName" class="form-control" disabled placeholder="iso file name">
             </div>
         </form>
-        <div class="" v-show="uploadStarted">
+        <div class="" v-show="uploadStarted && showImageAdd">
             <div class="progress-bar progress-bar-striped" :class="{active: uploadIsActive}" role="progressbar" :style="progressbarWidth">
                 {{ uploadProgress + "%"}}
             </div>
@@ -95,7 +95,7 @@
             },
             baseUrl: {
                 type: String,
-                default: 'http://10.62.59.150:7070'
+                default: 'http://10.62.59.150:7070/'
             },
             imageUploadUrl: {
                 type: String,

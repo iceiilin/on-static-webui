@@ -10,16 +10,12 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">On-Static Host Settings</h3>
                 </div>
-                <!--<div class="form-inline">-->
-                    <div class="form-group">
-                        <label>IP address</label>
-                        <input type="text" v-model.trim="hostIpAddr" @change="hostChanged" class="form-control has-success">
-                    </div>
-                    <div class="form-group">
-                        <label>port</label>
-                        <input type="text" v-model.number="hostPort" @change="hostChanged" class="form-control">
-                    </div>
-                <!--</div>-->
+                <div class="input-group">
+                        <label class="input-group-addon">IP address</label>
+                        <input class="form-control"type="text" v-model.trim="hostIpAddr" @change="hostChanged">
+                        <label class="input-group-addon">port</label>
+                        <input class="form-control"type="text" v-model.number="hostPort" @change="hostChanged">
+                </div>
             </div>
         </div>
     </div>
@@ -146,7 +142,7 @@
                 isos: [{ size: 100, name: 'test' }],
                 hostIpAddr: "10.62.59.150",
                 hostPort: "7070",
-                baseUrl: "http://10.62.59.150:7070"
+                baseUrl: "http://10.62.59.150:7070/"
             }
         }
     }
