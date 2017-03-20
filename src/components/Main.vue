@@ -98,17 +98,6 @@
                         console.log('err', err)
                     })
             },
-            removeIso: function (id) {
-                var self = this;
-                console.log(id);
-                console.log(this.isos[id]);
-                let isoName = this.isos[id].name;
-
-                return self.$.deleteIso(isoName)
-                    .then(function () {
-                        return self.getIsos();
-                    })
-            },
             // hostChanged: function(){
             //     console.log('host changed', this.baseUrl);
             // },
